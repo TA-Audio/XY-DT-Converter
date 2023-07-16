@@ -19,14 +19,14 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 
 
 
-void controlChange(byte channel, byte number, byte value) {
+void controlChange(byte channel, byte value, byte number) {
 
   switch (currentProgram) {
     case 0:
       //+2 OCT
-      if (number == 127) {
+      if (number == 127 && value == 92) {
         MIDI.sendProgramChange(0, 1);
-      } else if (number == 0) {
+      } else if (number == 0 && value == 92) {
         MIDI.sendProgramChange(21, 1);
       } else {
         MIDI.sendControlChange(value, number, channel);
@@ -34,9 +34,9 @@ void controlChange(byte channel, byte number, byte value) {
       break;
     case 1:
       //+1 OCT
-      if (number == 127) {
+      if (number == 127 && value == 92) {
         MIDI.sendProgramChange(1, 1);
-      } else if (number == 0) {
+      } else if (number == 0 && value == 92) {
         MIDI.sendProgramChange(22, 1);
       } else {
         MIDI.sendControlChange(value, number, channel);
@@ -44,9 +44,9 @@ void controlChange(byte channel, byte number, byte value) {
       break;
     case 2:
       //-1 OCT
-      if (number == 127) {
+      if (number == 127 && value == 92) {
         MIDI.sendProgramChange(7, 1);
-      } else if (number == 0) {
+      } else if (number == 0 && value == 92) {
         MIDI.sendProgramChange(28, 1);
       } else {
         MIDI.sendControlChange(value, number, channel);
@@ -55,9 +55,9 @@ void controlChange(byte channel, byte number, byte value) {
     case 3:
       //-2 OCT
 
-      if (number == 127) {
+      if (number == 127 && value == 92) {
         MIDI.sendProgramChange(8, 1);
-      } else if (number == 0) {
+      } else if (number == 0 && value == 92) {
         MIDI.sendProgramChange(29, 1);
       } else {
         MIDI.sendControlChange(value, number, channel);
@@ -65,9 +65,9 @@ void controlChange(byte channel, byte number, byte value) {
       break;
     case 4:
       //DIVE
-      if (number == 127) {
+      if (number == 127 && value == 92) {
         MIDI.sendProgramChange(9, 1);
-      } else if (number == 0) {
+      } else if (number == 0 && value == 92) {
         MIDI.sendProgramChange(30, 1);
       } else {
         MIDI.sendControlChange(value, number, channel);
@@ -75,9 +75,9 @@ void controlChange(byte channel, byte number, byte value) {
       break;
     case 5:
       //+1/-1 HAR
-      if (number == 127) {
+      if (number == 127 && value == 92) {
         MIDI.sendProgramChange(20, 1);
-      } else if (number == 0) {
+      } else if (number == 0 && value == 92) {
         MIDI.sendProgramChange(41, 1);
       } else {
         MIDI.sendControlChange(value, number, channel);
@@ -89,12 +89,13 @@ void controlChange(byte channel, byte number, byte value) {
 void setup() {
   tm.begin();
 
-  MIDI.begin(1);
+  MIDI.begin();
   MIDI.turnThruOff();
   MIDI.setHandleControlChange(controlChange);
 
   tm.changeBrightness(10);
   tm.display("P2OC");
+
 }
 
 
