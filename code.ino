@@ -1,5 +1,5 @@
 // Include the library
-#include <TM1637Display.h>
+#include <TM1637.h>
 #include <MIDI.h>
 #include <RotaryEncoder.h>
 
@@ -11,52 +11,13 @@
 
 
 // Create a display object of type TM1637Display
-TM1637Display display = TM1637Display(CLK, DIO);
-RotaryEncoder encoder(PIN_IN1, PIN_IN2, RotaryEncoder::LatchMode::TWO03);
+TM1637 tm(4, 5);
+RotaryEncoder encoder(PIN_IN1, PIN_IN2, RotaryEncoder::LatchMode::FOUR3);
 int currentProgram = 0;
 
 MIDI_CREATE_DEFAULT_INSTANCE();
 
-struct Program {
-  uint8_t Name[21];
-};
 
-const Program programs[] = {
-  { { SEG_A | SEG_F | SEG_G | SEG_C | SEG_D,
-      SEG_F | SEG_E | SEG_D | SEG_C | SEG_G,
-      SEG_F | SEG_E | SEG_G | SEG_C | SEG_B,
-      SEG_B | SEG_C } },
-  { { SEG_A | SEG_F | SEG_G | SEG_C | SEG_D,
-      SEG_F | SEG_E | SEG_D | SEG_C | SEG_G,
-      SEG_F | SEG_E | SEG_G | SEG_C | SEG_B,
-      SEG_A | SEG_B | SEG_G | SEG_E | SEG_D } },
-  { { SEG_A | SEG_F | SEG_G | SEG_C | SEG_E,
-      SEG_A | SEG_B | SEG_C | SEG_E | SEG_F | SEG_G,
-      SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F,
-      SEG_A | SEG_F | SEG_G | SEG_C | SEG_D } },
-  { { SEG_E | SEG_F | SEG_A | SEG_B | SEG_C,
-      SEG_A | SEG_F | SEG_E | SEG_D | SEG_G,
-      SEG_F | SEG_E | SEG_D | SEG_C | SEG_G } },
-  { { SEG_E | SEG_F | SEG_A | SEG_B | SEG_C,
-      SEG_A | SEG_F | SEG_E | SEG_D | SEG_G,
-      SEG_F | SEG_E | SEG_D | SEG_C | SEG_G,
-      SEG_A | SEG_B | SEG_G | SEG_E | SEG_D } },
-  { { SEG_F | SEG_B | SEG_D,
-      SEG_A | SEG_F | SEG_G | SEG_C | SEG_E,
-      SEG_F | SEG_B | SEG_D,
-      0x00 } },
-  { { SEG_B | SEG_C,
-      SEG_E | SEG_F | SEG_A | SEG_B | SEG_C,
-      0x00,
-      0x00 } },
-  { { SEG_A | SEG_F | SEG_E | SEG_D | SEG_C,
-      SEG_A | SEG_B | SEG_C | SEG_E | SEG_F | SEG_G,
-      SEG_F | SEG_E | SEG_D,
-      SEG_F | SEG_E | SEG_D } }
-};
-
-
-const int numPrograms = sizeof(programs) / sizeof(programs[0]);
 
 void controlChange(byte channel, byte number, byte value) {
 
@@ -126,12 +87,14 @@ void controlChange(byte channel, byte number, byte value) {
 }
 
 void setup() {
-  display.setBrightness(5);
-  //   display.setSegments(programs[currentProgram].Name);
+  tm.begin();
 
   MIDI.begin(1);
   MIDI.turnThruOff();
   MIDI.setHandleControlChange(controlChange);
+
+  tm.changeBrightness(10);
+  tm.display("P2OC");
 }
 
 
@@ -149,15 +112,45 @@ void loop() {
     if (dir == 1) {
       //CLOCKWISE
       currentProgram++;
-      if (currentProgram >= numPrograms) {
+      if (currentProgram >= 6) {
         currentProgram = 0;  // loop back to the start
       }
     } else if (dir == -1) {
       //CCW
       currentProgram--;
       if (currentProgram < 0) {
-        currentProgram = numPrograms - 1;  // loop back to the end
+        currentProgram = 6 - 1;  // loop back to the end
       }
     }
+
+    tm.clearScreen();
+
+
+    switch (currentProgram) {
+      case 0:
+        tm.display("P2OC");
+        break;
+      case 1:
+        tm.display("P1OC");
+        break;
+
+      case 2:
+        tm.display("N1OC");
+        break;
+
+      case 3:
+        tm.display("N2OC");
+        break;
+
+      case 4:
+        tm.display("DI");
+        break;
+
+      case 5:
+        tm.display("HARM");
+        break;
+    }
+
+    pos = newPos;
   }
 }
